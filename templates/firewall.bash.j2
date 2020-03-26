@@ -60,12 +60,10 @@ iptables -A INPUT -p tcp -m tcp --dport {{ port }} -j ACCEPT
 iptables -A INPUT -p udp -m udp --dport {{ port }} -j ACCEPT
 {% endfor %}
 
+{% if firewall_accept_icmp_ping %}
 # Accept icmp ping requests.
 iptables -A INPUT -p icmp -j ACCEPT
-
-# Allow NTP traffic for time synchronization.
-iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
-iptables -A INPUT -p udp --sport 123 -j ACCEPT
+{% endif %}
 
 # Additional custom rules.
 {% for rule in firewall_additional_rules %}
@@ -75,8 +73,10 @@ iptables -A INPUT -p udp --sport 123 -j ACCEPT
 # Allow established connections:
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
+{% if firewall_debug_logging %}
 # Log EVERYTHING (ONLY for Debug).
-# iptables -A INPUT -j LOG
+iptables -A INPUT -j LOG
+{% endif %}
 
 {% if firewall_log_dropped_packets %}
 # Log other incoming requests (all of which are dropped) at 15/minute max.
@@ -108,12 +108,10 @@ if [ -x "$(which ip6tables 2>/dev/null)" ]; then
   ip6tables -A INPUT -p udp -m udp --dport {{ port }} -j ACCEPT
 {% endfor %}
 
+{% if firewall_accept_icmp_ping %}
   # Accept icmp ping requests.
   ip6tables -A INPUT -p icmpv6 -j ACCEPT
-
-  # Allow NTP traffic for time synchronization.
-  ip6tables -A OUTPUT -p udp --dport 123 -j ACCEPT
-  ip6tables -A INPUT -p udp --sport 123 -j ACCEPT
+{% endif %}
 
   # Additional custom rules.
 {% for rule in firewall_ip6_additional_rules %}
@@ -123,8 +121,10 @@ if [ -x "$(which ip6tables 2>/dev/null)" ]; then
   # Allow established connections:
   ip6tables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
+{% if firewall_debug_logging %}
   # Log EVERYTHING (ONLY for Debug).
-  # ip6tables -A INPUT -j LOG
+  ip6tables -A INPUT -j LOG
+{% endif %}
 
 {% if firewall_log_dropped_packets %}
   # Log other incoming requests (all of which are dropped) at 15/minute max.
