@@ -13,7 +13,7 @@
     dest: /etc/firewall.bash
     owner: root
     group: root
-    mode: 0744
+    mode: "{{ firewall_script_mode }}"
   notify: restart firewall
 
 - name: Copy firewall init script into place.
