@@ -32,6 +32,7 @@ iptables -P OUTPUT ACCEPT
 {% if firewall_flush_rules_and_chains %}
 # Remove all rules and chains.
 iptables -t nat -F
+iptables -t nat -X
 iptables -t mangle -F
 iptables -F
 iptables -X
